@@ -97,6 +97,7 @@
   border-radius: 1.5em;
   background: #004980;
   cursor: pointer;
+  user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
