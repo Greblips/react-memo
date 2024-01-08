@@ -1,7 +1,14 @@
 import { Link } from "react-router-dom";
 import styles from "./SelectLevelPage.module.css";
+import { useState } from "react";
 
 export function SelectLevelPage() {
+  const [mode, setMode] = useState(false);
+
+  function chengeCheckbox() {
+    setMode(!mode);
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.modal}>
@@ -23,6 +30,16 @@ export function SelectLevelPage() {
             </Link>
           </li>
         </ul>
+        <div className={styles.toggleCheckBox}>
+          <input type="checkbox" id="pill4" name="check" checked={mode} onChange={chengeCheckbox} />
+          <label htmlFor="pill4"></label>
+        </div>
+
+        {mode ? (
+          <p className={styles.mode}>Легкий режим (3 жизни)</p>
+        ) : (
+          <p className={styles.noMode}>Стандартная игра</p>
+        )}
       </div>
     </div>
   );
