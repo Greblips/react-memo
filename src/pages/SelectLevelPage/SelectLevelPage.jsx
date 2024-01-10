@@ -1,12 +1,16 @@
 import { Link } from "react-router-dom";
 import styles from "./SelectLevelPage.module.css";
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsActiveGameModeNative } from "../../store/slices/game";
+import { setIsActiveGameMode } from "../../store/slices/gameMod";
 
 export function SelectLevelPage() {
-  const [mode, setMode] = useState(false);
+  const dispatch = useDispatch();
+  const nativegame = useSelector(state => state.game.isActiveGameMode);
 
   function chengeCheckbox() {
-    setMode(!mode);
+    dispatch(setIsActiveGameMode());
+    dispatch(setIsActiveGameModeNative());
   }
 
   return (
@@ -31,11 +35,11 @@ export function SelectLevelPage() {
           </li>
         </ul>
         <div className={styles.toggleCheckBox}>
-          <input type="checkbox" id="pill4" name="check" checked={mode} onChange={chengeCheckbox} />
+          <input type="checkbox" id="pill4" name="check" checked={nativegame} onChange={chengeCheckbox} />
           <label htmlFor="pill4"></label>
         </div>
 
-        {mode ? (
+        {nativegame ? (
           <p className={styles.mode}>Легкий режим (3 жизни)</p>
         ) : (
           <p className={styles.noMode}>Стандартная игра</p>
