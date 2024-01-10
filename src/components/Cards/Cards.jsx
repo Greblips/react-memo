@@ -5,7 +5,7 @@ import styles from "./Cards.module.css";
 import { EndGameModal } from "../../components/EndGameModal/EndGameModal";
 import { Button } from "../../components/Button/Button";
 import { Card } from "../../components/Card/Card";
-// import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 // import { delLive } from "../../store/slices/gameMod";
 
 // Игра закончилась
@@ -43,7 +43,7 @@ function getTimerValue(startDate, endDate) {
  * previewSeconds - сколько секунд пользователь будет видеть все карты открытыми до начала игры
  */
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
-  // const Mod = useSelector(state => state.gameMod);
+  const { isActiveEasyMode } = useSelector(state => state.game);
   // const dispatch = useDispatch();
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
@@ -54,6 +54,10 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const [gameStartDate, setGameStartDate] = useState(null);
   // Дата конца игры
   const [gameEndDate, setGameEndDate] = useState(null);
+
+  //Счетчик ошибок
+  // Количество попыток
+  const [tryes, setTryes] = useState(3);
 
   // Стейт для таймера, высчитывается в setInteval на основе gameStartDate и gameEndDate
   const [timer, setTimer] = useState({
@@ -71,6 +75,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     setGameStartDate(startDate);
     setTimer(getTimerValue(startDate, null));
     setStatus(STATUS_IN_PROGRESS);
+    setTryes(3);
   }
   function resetGame() {
     setGameStartDate(null);
@@ -91,6 +96,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     if (clickedCard.open) {
       return;
     }
+    const previousCards = [...cards];
     // Игровое поле после открытия кликнутой карты
     const nextCards = cards.map(card => {
       if (card.id !== clickedCard.id) {
@@ -102,7 +108,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
         open: true,
       };
     });
-
+    console.log(nextCards);
     setCards(nextCards);
 
     const isPlayerWon = nextCards.every(card => card.open);
@@ -115,11 +121,11 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
     // Открытые карты на игровом поле
     const openCards = nextCards.filter(card => card.open);
-
+    console.log(openCards);
     // Ищем открытые карты, у которых нет пары среди других открытых
     const openCardsWithoutPair = openCards.filter(card => {
       const sameCards = openCards.filter(openCard => card.suit === openCard.suit && card.rank === openCard.rank);
-
+      console.log(sameCards);
       if (sameCards.length < 2) {
         return true;
       }
@@ -128,10 +134,22 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     });
 
     const playerLost = openCardsWithoutPair.length >= 2;
-
     // "Игрок проиграл", т.к на поле есть две открытые карты без пары
+    if (isActiveEasyMode && playerLost) {
+      setTryes(tryes - 1);
+      setCards(nextCards);
+      setTimeout(() => {
+        if (tryes <= 1) finishGame(STATUS_LOST);
+        setCards(previousCards);
+      }, 500);
+      return;
+    }
+
+    if (tryes < 1) finishGame(STATUS_LOST);
+
     if (playerLost) {
       finishGame(STATUS_LOST);
+
       return;
     }
 
@@ -179,7 +197,6 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div></div>
         <div className={styles.timer}>
           {status === STATUS_PREVIEW ? (
             <div>
@@ -192,6 +209,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
                 <div className={styles.timerDescription}>min</div>
                 <div>{timer.minutes.toString().padStart("2", "0")}</div>
               </div>
+              <div>:</div>
               <div className={styles.timerValue}>
                 <div className={styles.timerDescription}>sec</div>
                 <div>{timer.seconds.toString().padStart("2", "0")}</div>
@@ -213,6 +231,8 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
           />
         ))}
       </div>
+
+      {isActiveEasyMode === true ? <div>Осталось {tryes} попытки</div> : ""}
 
       {isGameEnded ? (
         <div className={styles.modalContainer}>

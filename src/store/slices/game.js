@@ -3,11 +3,15 @@ const getGameSlice = createSlice({
   name: "game",
 
   initialState: {
-    gameRegime: false,
+    isActiveEasyMode: true,
+    lives: [0, 0, 0],
   },
   reducers: {
     gameModeReducer(state) {
-      state.gameRegime ? (state.gameRegime = false) : (state.gameRegime = true);
+      state.isActiveEasyMode = !state.isActiveEasyMode;
+    },
+    delLive(state) {
+      state.lives.pop();
     },
   },
 });
