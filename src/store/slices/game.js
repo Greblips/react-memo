@@ -1,19 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-const gameSlice = createSlice({
+const getGameSlice = createSlice({
   name: "game",
+
   initialState: {
-    isActiveGameMode: true,
-    lives: [0],
+    gameRegime: false,
   },
   reducers: {
-    setIsActiveGameModeNative(state) {
-      state.isActiveGameMode = !state.isActiveGameMode;
-    },
-    delLive(state) {
-      state.lives.pop();
+    gameModeReducer(state) {
+      state.gameRegime ? (state.gameRegime = false) : (state.gameRegime = true);
     },
   },
 });
 
-export const { setIsActiveGameModeNative, delLive } = gameSlice.actions;
-export const gameReducer = gameSlice.reducer;
+export const { gameModeReducer } = getGameSlice.actions;
+export default getGameSlice.reducer;

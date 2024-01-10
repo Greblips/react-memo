@@ -5,8 +5,8 @@ import styles from "./Cards.module.css";
 import { EndGameModal } from "../../components/EndGameModal/EndGameModal";
 import { Button } from "../../components/Button/Button";
 import { Card } from "../../components/Card/Card";
-import { useSelector, useDispatch } from "react-redux";
-import { delLive } from "../../store/slices/gameMod";
+// import { useSelector, useDispatch } from "react-redux";
+// import { delLive } from "../../store/slices/gameMod";
 
 // Игра закончилась
 const STATUS_LOST = "STATUS_LOST";
@@ -43,8 +43,8 @@ function getTimerValue(startDate, endDate) {
  * previewSeconds - сколько секунд пользователь будет видеть все карты открытыми до начала игры
  */
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
-  const Mod = useSelector(state => state.gameMod);
-  const dispatch = useDispatch();
+  // const Mod = useSelector(state => state.gameMod);
+  // const dispatch = useDispatch();
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
   // Текущий статус игры
@@ -131,11 +131,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
     // "Игрок проиграл", т.к на поле есть две открытые карты без пары
     if (playerLost) {
-      if (Mod.lives.length === 0) {
-        finishGame(STATUS_LOST);
-      } else {
-        dispatch(delLive());
-      }
+      finishGame(STATUS_LOST);
       return;
     }
 
@@ -228,12 +224,6 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
           />
         </div>
       ) : null}
-      <div className={styles.liveBox}>
-        {Mod &&
-          Mod.lives.map((liveblock, index) => {
-            return <div className={styles.liveBlock} key={index}></div>;
-          })}
-      </div>
     </div>
   );
 }

@@ -1,17 +1,22 @@
 import { Link } from "react-router-dom";
 import styles from "./SelectLevelPage.module.css";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsActiveGameModeNative } from "../../store/slices/game";
-import { setIsActiveGameMode } from "../../store/slices/gameMod";
+import { gameModeReducer } from "../../store/slices/game";
+
+// import { useDispatch, useSelector } from "react-redux";
+// import { setIsActiveGameModeNative } from "../../store/slices/game";
+// import { setIsActiveGameMode } from "../../store/slices/gameMod";
 
 export function SelectLevelPage() {
   const dispatch = useDispatch();
-  const nativegame = useSelector(state => state.game.isActiveGameMode);
+  const { gameRegime } = useSelector(state => state.game);
+  // const dispatch = useDispatch();
+  // const nativegame = useSelector(state => state.game.isActiveGameMode);
 
-  function chengeCheckbox() {
-    dispatch(setIsActiveGameMode());
-    dispatch(setIsActiveGameModeNative());
-  }
+  // function chengeCheckbox() {
+  //   dispatch(setIsActiveGameMode());
+  //   dispatch(setIsActiveGameModeNative());
+  // }
 
   return (
     <div className={styles.container}>
@@ -35,11 +40,18 @@ export function SelectLevelPage() {
           </li>
         </ul>
         <div className={styles.toggleCheckBox}>
-          <input type="checkbox" id="pill4" name="check" checked={nativegame} onChange={chengeCheckbox} />
+          <input
+            type="checkbox"
+            id="pill4"
+            name="check"
+            onChange={() => {
+              dispatch(gameModeReducer());
+            }}
+          />
           <label htmlFor="pill4"></label>
         </div>
 
-        {nativegame ? (
+        {gameRegime ? (
           <p className={styles.mode}>Легкий режим (3 жизни)</p>
         ) : (
           <p className={styles.noMode}>Стандартная игра</p>
