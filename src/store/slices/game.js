@@ -3,7 +3,7 @@ const getGameSlice = createSlice({
   name: "game",
 
   initialState: {
-    isActiveEasyMode: true,
+    isActiveEasyMode: false,
     lives: [0, 0, 0],
   },
   reducers: {

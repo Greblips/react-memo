@@ -41,9 +41,9 @@ export function SelectLevelPage() {
         </div>
 
         {isActiveEasyMode ? (
-          <p className={styles.noMode}>Стандартная игра</p>
-        ) : (
           <p className={styles.mode}>Легкий режим (3 жизни)</p>
+        ) : (
+          <p className={styles.noMode}>Стандартная игра</p>
         )}
       </div>
     </div>

@@ -44,6 +44,7 @@ function getTimerValue(startDate, endDate) {
  */
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const { isActiveEasyMode } = useSelector(state => state.game);
+
   // const dispatch = useDispatch();
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
@@ -54,7 +55,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const [gameStartDate, setGameStartDate] = useState(null);
   // Дата конца игры
   const [gameEndDate, setGameEndDate] = useState(null);
-
+  const [previousCards, setPreviousCards] = useState(cards);
   //Счетчик ошибок
   // Количество попыток
   const [tryes, setTryes] = useState(3);
@@ -96,7 +97,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     if (clickedCard.open) {
       return;
     }
-    const previousCards = [...cards];
+
     // Игровое поле после открытия кликнутой карты
     const nextCards = cards.map(card => {
       if (card.id !== clickedCard.id) {
@@ -108,6 +109,9 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
         open: true,
       };
     });
+
+    const prevCards = [...cards];
+
     console.log(nextCards);
     setCards(nextCards);
 
@@ -152,7 +156,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
       return;
     }
-
+    setPreviousCards(prevCards);
     // ... игра продолжается
   };
 
