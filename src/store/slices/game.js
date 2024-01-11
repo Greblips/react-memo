@@ -16,5 +16,5 @@ const getGameSlice = createSlice({
   },
 });
 
-export const { gameModeReducer } = getGameSlice.actions;
+export const { gameModeReducer, delLive } = getGameSlice.actions;
 export default getGameSlice.reducer;

@@ -84,3 +84,11 @@
   height: 40px;
   background-color: red;
 }
+.textHp {
+  margin-left: 15px;
+  font-size: 1.2rem;
+  border: solid 1px rgb(255, 255, 255);
+  border-radius: 15px;
+  padding: 5px;
+  color: #ffffff;
+}

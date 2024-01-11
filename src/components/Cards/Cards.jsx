@@ -6,7 +6,6 @@ import { EndGameModal } from "../../components/EndGameModal/EndGameModal";
 import { Button } from "../../components/Button/Button";
 import { Card } from "../../components/Card/Card";
 import { useSelector } from "react-redux";
-// import { delLive } from "../../store/slices/gameMod";
 
 // Игра закончилась
 const STATUS_LOST = "STATUS_LOST";
@@ -45,6 +44,8 @@ function getTimerValue(startDate, endDate) {
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const { isActiveEasyMode } = useSelector(state => state.game);
 
+  // console.log(lives);
+
   // const dispatch = useDispatch();
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
@@ -58,7 +59,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const [previousCards, setPreviousCards] = useState(cards);
   //Счетчик ошибок
   // Количество попыток
-  const [tryes, setTryes] = useState(3);
+  const [tryes, setTryes] = useState(() => (isActiveEasyMode ? 3 : null));
 
   // Стейт для таймера, высчитывается в setInteval на основе gameStartDate и gameEndDate
   const [timer, setTimer] = useState({
@@ -79,6 +80,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     setTryes(3);
   }
   function resetGame() {
+    isActiveEasyMode && setTryes(3);
     setGameStartDate(null);
     setGameEndDate(null);
     setTimer(getTimerValue(null, null));
@@ -140,7 +142,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     const playerLost = openCardsWithoutPair.length >= 2;
     // "Игрок проиграл", т.к на поле есть две открытые карты без пары
     if (isActiveEasyMode && playerLost) {
-      setTryes(tryes - 1);
+      setTryes(() => tryes - 1);
       setCards(nextCards);
       setTimeout(() => {
         if (tryes <= 1) finishGame(STATUS_LOST);
@@ -218,9 +220,11 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
                 <div className={styles.timerDescription}>sec</div>
                 <div>{timer.seconds.toString().padStart("2", "0")}</div>
               </div>
+              {isActiveEasyMode === true ? <div className={styles.textHp}>Осталось {tryes} жизни</div> : ""}
             </>
           )}
         </div>
+
         {status === STATUS_IN_PROGRESS ? <Button onClick={resetGame}>Начать заново</Button> : null}
       </div>
 
@@ -235,9 +239,6 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
           />
         ))}
       </div>
-
-      {isActiveEasyMode === true ? <div>Осталось {tryes} попытки</div> : ""}
-
       {isGameEnded ? (
         <div className={styles.modalContainer}>
           <EndGameModal
@@ -248,6 +249,9 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
           />
         </div>
       ) : null}
+      {/* <div className={styles.liveBox}>
+        {lives && lives.map((life, index) => <div className={styles.liveBlock} key={index}></div>)}
+      </div> */}
     </div>
   );
 }
