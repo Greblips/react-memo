@@ -78,10 +78,12 @@
   perspective: 1000;
 }
 
-.flipContainer:hover .flipper {
+/* Убрал анимацию наведения,очень странно работает */
+
+/* .flipContainer:hover .flipper {
   transition: 0.2s;
   transform: rotateY(35deg);
-}
+} */
 
 .flipContainer.flip .flipper {
   transform: rotateY(180deg);

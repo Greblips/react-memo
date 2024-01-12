@@ -5,6 +5,8 @@ import styles from "./Cards.module.css";
 import { EndGameModal } from "../../components/EndGameModal/EndGameModal";
 import { Button } from "../../components/Button/Button";
 import { Card } from "../../components/Card/Card";
+import { useSelector } from "react-redux";
+import lifeLogo from "./images/life.svg";
 
 // Игра закончилась
 const STATUS_LOST = "STATUS_LOST";
@@ -41,8 +43,13 @@ function getTimerValue(startDate, endDate) {
  * previewSeconds - сколько секунд пользователь будет видеть все карты открытыми до начала игры
  */
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
+  const { isActiveEasyMode } = useSelector(state => state.game);
+
+  // const [arr, setValue] = useState(lives);
+
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
+
   // Текущий статус игры
   const [status, setStatus] = useState(STATUS_PREVIEW);
 
@@ -50,7 +57,14 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const [gameStartDate, setGameStartDate] = useState(null);
   // Дата конца игры
   const [gameEndDate, setGameEndDate] = useState(null);
-
+  const [previousCards, setPreviousCards] = useState(cards);
+  //Счетчик ошибок
+  // Количество попыток
+  const [tryes, setTryes] = useState(() => (isActiveEasyMode ? 3 : null));
+  // Массив из колличества жизней,для отображения на игровом поле
+  const lives = Array(tryes)
+    .fill()
+    .map((e, i) => i + 1);
   // Стейт для таймера, высчитывается в setInteval на основе gameStartDate и gameEndDate
   const [timer, setTimer] = useState({
     seconds: 0,
@@ -67,8 +81,11 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     setGameStartDate(startDate);
     setTimer(getTimerValue(startDate, null));
     setStatus(STATUS_IN_PROGRESS);
+    setTryes(3);
   }
   function resetGame() {
+    isActiveEasyMode && setTryes(3);
+    // isActiveEasyMode && setHp(3);
     setGameStartDate(null);
     setGameEndDate(null);
     setTimer(getTimerValue(null, null));
@@ -87,6 +104,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     if (clickedCard.open) {
       return;
     }
+
     // Игровое поле после открытия кликнутой карты
     const nextCards = cards.map(card => {
       if (card.id !== clickedCard.id) {
@@ -99,6 +117,9 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
       };
     });
 
+    const prevCards = [...cards];
+
+    // console.log(nextCards);
     setCards(nextCards);
 
     const isPlayerWon = nextCards.every(card => card.open);
@@ -124,13 +145,25 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     });
 
     const playerLost = openCardsWithoutPair.length >= 2;
-
     // "Игрок проиграл", т.к на поле есть две открытые карты без пары
-    if (playerLost) {
-      finishGame(STATUS_LOST);
+    if (isActiveEasyMode && playerLost) {
+      setTryes(() => tryes - 1);
+      setCards(nextCards);
+      setTimeout(() => {
+        if (tryes <= 1) finishGame(STATUS_LOST);
+        setCards(previousCards);
+      }, 500);
       return;
     }
 
+    if (tryes < 1) finishGame(STATUS_LOST);
+
+    if (playerLost) {
+      finishGame(STATUS_LOST);
+
+      return;
+    }
+    setPreviousCards(prevCards);
     // ... игра продолжается
   };
 
@@ -187,7 +220,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
                 <div className={styles.timerDescription}>min</div>
                 <div>{timer.minutes.toString().padStart("2", "0")}</div>
               </div>
-              .
+              <div>:</div>
               <div className={styles.timerValue}>
                 <div className={styles.timerDescription}>sec</div>
                 <div>{timer.seconds.toString().padStart("2", "0")}</div>
@@ -195,6 +228,13 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
             </>
           )}
         </div>
+        {status === STATUS_IN_PROGRESS && isActiveEasyMode === true ? (
+          <div className={styles.liveBox}>
+            {lives && lives.map(index => <img key={index} className={styles.liveBlock} src={lifeLogo} alt="hp" />)}
+          </div>
+        ) : (
+          ""
+        )}
         {status === STATUS_IN_PROGRESS ? <Button onClick={resetGame}>Начать заново</Button> : null}
       </div>
 
@@ -209,7 +249,6 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
           />
         ))}
       </div>
-
       {isGameEnded ? (
         <div className={styles.modalContainer}>
           <EndGameModal

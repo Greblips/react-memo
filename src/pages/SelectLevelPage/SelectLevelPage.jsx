@@ -1,7 +1,12 @@
 import { Link } from "react-router-dom";
 import styles from "./SelectLevelPage.module.css";
+import { useDispatch, useSelector } from "react-redux";
+import { gameModeReducer } from "../../store/slices/game";
 
 export function SelectLevelPage() {
+  const dispatch = useDispatch();
+  const { isActiveEasyMode } = useSelector(state => state.game);
+
   return (
     <div className={styles.container}>
       <div className={styles.modal}>
@@ -23,6 +28,23 @@ export function SelectLevelPage() {
             </Link>
           </li>
         </ul>
+        <div className={styles.toggleCheckBox}>
+          <input
+            type="checkbox"
+            id="toggleCheckBox"
+            name="check"
+            onChange={() => {
+              dispatch(gameModeReducer());
+            }}
+          />
+          <label htmlFor="toggleCheckBox"></label>
+        </div>
+
+        {isActiveEasyMode ? (
+          <p className={styles.mode}>Легкий режим (3 жизни)</p>
+        ) : (
+          <p className={styles.noMode}>Стандартная игра</p>
+        )}
       </div>
     </div>
   );
