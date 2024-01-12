@@ -28,7 +28,8 @@
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
+
   margin-bottom: 35px;
 }
 
@@ -87,7 +88,7 @@
 .textHp {
   margin-left: 15px;
   font-size: 1.2rem;
-  border: solid 1px rgb(255, 255, 255);
+  /* border: solid 1px rgb(255, 255, 255); */
   border-radius: 15px;
   padding: 5px;
   color: #ffffff;
