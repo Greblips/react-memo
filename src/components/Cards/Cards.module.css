@@ -71,24 +71,16 @@
 }
 .liveBox {
   display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin: auto;
-  position: fixed;
-  bottom: 100px;
-  left: 0;
-  right: 0;
+  gap: 0.5rem;
 }
 
 .liveBlock {
   width: 40px;
   height: 40px;
-  background-color: red;
 }
 .textHp {
   margin-left: 15px;
   font-size: 1.2rem;
-  /* border: solid 1px rgb(255, 255, 255); */
   border-radius: 15px;
   padding: 5px;
   color: #ffffff;

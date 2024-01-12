@@ -6,6 +6,7 @@ import { EndGameModal } from "../../components/EndGameModal/EndGameModal";
 import { Button } from "../../components/Button/Button";
 import { Card } from "../../components/Card/Card";
 import { useSelector } from "react-redux";
+import lifeLogo from "./images/life.svg";
 
 // Игра закончилась
 const STATUS_LOST = "STATUS_LOST";
@@ -44,11 +45,11 @@ function getTimerValue(startDate, endDate) {
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const { isActiveEasyMode } = useSelector(state => state.game);
 
-  // console.log(lives);
+  // const [arr, setValue] = useState(lives);
 
-  // const dispatch = useDispatch();
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
+
   // Текущий статус игры
   const [status, setStatus] = useState(STATUS_PREVIEW);
 
@@ -60,7 +61,10 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   //Счетчик ошибок
   // Количество попыток
   const [tryes, setTryes] = useState(() => (isActiveEasyMode ? 3 : null));
-
+  // Массив из колличества жизней,для отображения на игровом поле
+  const lives = Array(tryes)
+    .fill()
+    .map((e, i) => i + 1);
   // Стейт для таймера, высчитывается в setInteval на основе gameStartDate и gameEndDate
   const [timer, setTimer] = useState({
     seconds: 0,
@@ -81,6 +85,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   }
   function resetGame() {
     isActiveEasyMode && setTryes(3);
+    // isActiveEasyMode && setHp(3);
     setGameStartDate(null);
     setGameEndDate(null);
     setTimer(getTimerValue(null, null));
@@ -114,7 +119,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
     const prevCards = [...cards];
 
-    console.log(nextCards);
+    // console.log(nextCards);
     setCards(nextCards);
 
     const isPlayerWon = nextCards.every(card => card.open);
@@ -127,11 +132,11 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
     // Открытые карты на игровом поле
     const openCards = nextCards.filter(card => card.open);
-    console.log(openCards);
+
     // Ищем открытые карты, у которых нет пары среди других открытых
     const openCardsWithoutPair = openCards.filter(card => {
       const sameCards = openCards.filter(openCard => card.suit === openCard.suit && card.rank === openCard.rank);
-      console.log(sameCards);
+
       if (sameCards.length < 2) {
         return true;
       }
@@ -220,11 +225,16 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
                 <div className={styles.timerDescription}>sec</div>
                 <div>{timer.seconds.toString().padStart("2", "0")}</div>
               </div>
-              {isActiveEasyMode === true ? <div className={styles.textHp}>Осталось {tryes} жизни</div> : ""}
             </>
           )}
         </div>
-
+        {status === STATUS_IN_PROGRESS && isActiveEasyMode === true ? (
+          <div className={styles.liveBox}>
+            {lives && lives.map(index => <img key={index} className={styles.liveBlock} src={lifeLogo} alt="hp" />)}
+          </div>
+        ) : (
+          ""
+        )}
         {status === STATUS_IN_PROGRESS ? <Button onClick={resetGame}>Начать заново</Button> : null}
       </div>
 
@@ -249,9 +259,6 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
           />
         </div>
       ) : null}
-      {/* <div className={styles.liveBox}>
-        {lives && lives.map((life, index) => <div className={styles.liveBlock} key={index}></div>)}
-      </div> */}
     </div>
   );
 }
