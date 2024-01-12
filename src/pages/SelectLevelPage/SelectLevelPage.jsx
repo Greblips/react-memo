@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import styles from "./SelectLevelPage.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { gameModeReducer } from "../../store/slices/game";
+import { LeaderBoardLink } from "../../components/LeaderBoardLink/LeaderBoardLink";
 
 export function SelectLevelPage() {
   const dispatch = useDispatch();
@@ -45,6 +46,7 @@ export function SelectLevelPage() {
         ) : (
           <p className={styles.noMode}>Стандартная игра</p>
         )}
+        <LeaderBoardLink>Таблица лидеров</LeaderBoardLink>
       </div>
     </div>
   );
