@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styles from "./LeaderBoard.module.css";
-import { Button } from "../../components/Button/Button";
+// import { Button } from "../../components/Button/Button";
 import { LeaderboardEl } from "../../components/LeaderBoardEl/LeaderBoardEl";
 import { Link } from "react-router-dom";
 import { formatTime } from "../../utils/formatTime";
@@ -36,11 +36,9 @@ export const LeaderBoard = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.topHeading}>Лидерборд</h1>
-        <Button>
-          <Link className={styles.link} to="/">
-            Начать игру
-          </Link>
-        </Button>
+        <Link className={styles.link} to="/">
+          Начать игру
+        </Link>
       </div>
       <ul className={styles.table}>
         <LeaderboardEl position={"Позиция"} user={"Пользователь"} time={"Время"} color={"#999999"} />

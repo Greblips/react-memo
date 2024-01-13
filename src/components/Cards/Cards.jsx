@@ -70,6 +70,20 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     seconds: 0,
     minutes: 0,
   });
+  useEffect(() => {
+    if (status === STATUS_WON) {
+      fetch("https://wedev-api.sky.pro/api/v2/leaderboard/?limit = 12", {
+        method: "POST",
+        body: JSON.stringify({
+          name: localStorage.name,
+          time:
+            getTimerValue(gameStartDate, gameEndDate).minutes * 60 + getTimerValue(gameStartDate, gameEndDate).seconds,
+        }),
+      }).catch(error => {
+        console.log(error.message);
+      });
+    }
+  }, [status]);
 
   function finishGame(status = STATUS_LOST) {
     setGameEndDate(new Date());
@@ -85,7 +99,6 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   }
   function resetGame() {
     isActiveEasyMode && setTryes(3);
-    // isActiveEasyMode && setHp(3);
     setGameStartDate(null);
     setGameEndDate(null);
     setTimer(getTimerValue(null, null));

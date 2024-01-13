@@ -14,9 +14,11 @@ export function SelectLevelPage() {
   const [name, setName] = useState();
 
   function addName() {
-    if (name !== "" && name !== undefined) {
+    if (name !== "") {
       localStorage.name = name;
       setLsName(name);
+    } else {
+      alert("Введите имя");
     }
   }
 
