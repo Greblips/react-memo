@@ -5,6 +5,7 @@ import { useState } from "react";
 import { gameModeReducer } from "../../store/slices/game";
 import { LeaderBoardLink } from "../../components/LeaderBoardLink/LeaderBoardLink";
 import { Button } from "../../components/Button/Button";
+import { safeInputText } from "../../utils/safeinput";
 
 export function SelectLevelPage() {
   const dispatch = useDispatch();
@@ -26,18 +27,7 @@ export function SelectLevelPage() {
           <>
             <h1 className={styles.title}>Выбери сложность</h1>
             <div className={styles.nameBlock}>
-              <div className={styles.name}> Здравствуйте :{name}!</div>
-              <Link
-                href="/#"
-                className={styles.changeName}
-                onClick={() => {
-                  localStorage.name = "";
-                  setName(null);
-                  setLsName(null);
-                }}
-              >
-                Сменить имя
-              </Link>
+              <div className={styles.name}>{name}</div>
             </div>
 
             <ul className={styles.levels}>
@@ -73,7 +63,18 @@ export function SelectLevelPage() {
             ) : (
               <p className={styles.noMode}>Стандартная игра</p>
             )}
-            <LeaderBoardLink>Таблица лидеров</LeaderBoardLink>
+            <div className={styles.footer}>
+              <LeaderBoardLink>Таблица лидеров</LeaderBoardLink>
+              <Button
+                onClick={() => {
+                  localStorage.name = "";
+                  setName(null);
+                  setLsName(null);
+                }}
+              >
+                Сменить имя
+              </Button>
+            </div>
           </>
         ) : (
           <>
@@ -81,9 +82,12 @@ export function SelectLevelPage() {
               <h1 className={styles.title}>Введите имя</h1>
               <input
                 type="text"
+                name="username"
+                // minlength="1"
+                required
                 className={styles.input}
                 onChange={e => {
-                  setName(e.target.value);
+                  setName(safeInputText(e.target.value));
                 }}
               />
               <Button onClick={addName}>Запомнить меня</Button>
