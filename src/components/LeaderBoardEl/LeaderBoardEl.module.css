@@ -1,0 +1,25 @@
+.item {
+  width: 944px;
+  height: 64px;
+  display: flex;
+  box-sizing: border-box;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+
+  font-size: 24px;
+  font-family: StratosSkyeng;
+  background-color: #fff;
+  border-radius: 12px;
+}
+
+.position {
+  width: 25%;
+}
+
+.user {
+  width: 65%;
+}
+
+.time {
+  width: 10%;
+}

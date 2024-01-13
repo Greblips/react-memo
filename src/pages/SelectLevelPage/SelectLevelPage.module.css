@@ -126,3 +126,40 @@
   -webkit-transform: rotate(295deg);
   transform: rotate(295deg);
 }
+.input {
+  font-size: 1.5rem;
+  text-align: center;
+  height: 40px;
+  width: 240px;
+  align-items: center;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.nameBlock {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  text-align: center;
+  align-items: center;
+  height: 50px;
+  width: 400px;
+}
+.name {
+  font-size: 2rem;
+}
+.changeName {
+  font-size: 2rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.inputNameBlock {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  text-align: center;
+  align-items: center;
+  height: 200px;
+  width: 400px;
+}
