@@ -4,3 +4,7 @@ export const formatTime = timeInSeconds => {
 
   return `${minutes}:${seconds}`;
 };
+
+export const sortLeadersByTime = leaders => [...leaders].sort((a, b) => a.time - b.time);
+
+export const getTimeInSeconds = timer => timer.seconds + timer.minutes * 60;

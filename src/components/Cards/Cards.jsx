@@ -7,6 +7,8 @@ import { Button } from "../../components/Button/Button";
 import { Card } from "../../components/Card/Card";
 import { useSelector } from "react-redux";
 import lifeLogo from "./images/life.svg";
+import { getLeaders } from "../../utils/api";
+import { getTimeInSeconds, sortLeadersByTime } from "../../utils/formatTime";
 
 // Игра закончилась
 const STATUS_LOST = "STATUS_LOST";
@@ -45,13 +47,12 @@ function getTimerValue(startDate, endDate) {
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const { isActiveEasyMode } = useSelector(state => state.game);
 
-  // const [arr, setValue] = useState(lives);
-
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
 
   // Текущий статус игры
   const [status, setStatus] = useState(STATUS_PREVIEW);
+  const [isOnLeaderboard, setIsOnLeaderboard] = useState(false);
 
   // Дата начала игры
   const [gameStartDate, setGameStartDate] = useState(null);
@@ -71,7 +72,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     minutes: 0,
   });
   useEffect(() => {
-    if (status === STATUS_WON) {
+    if (status === STATUS_WON && isOnLeaderboard) {
       fetch("https://wedev-api.sky.pro/api/v2/leaderboard/?limit = 12", {
         method: "POST",
         body: JSON.stringify({
@@ -112,7 +113,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
    * - "Игрок проиграл", если на поле есть две открытые карты без пары
    * - "Игра продолжается", если не случилось первых двух условий
    */
-  const openCard = clickedCard => {
+  const openCard = async clickedCard => {
     // Если карта уже открыта, то ничего не делаем
     if (clickedCard.open) {
       return;
@@ -132,13 +133,17 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
     const prevCards = [...cards];
 
-    // console.log(nextCards);
     setCards(nextCards);
 
     const isPlayerWon = nextCards.every(card => card.open);
 
     // Победа - все карты на поле открыты
     if (isPlayerWon) {
+      const leaders = await getLeaders();
+      const sortedLeaders = sortLeadersByTime(leaders.leaders);
+      const leadersLength = sortedLeaders.length;
+      const isLeadResult = sortedLeaders[leadersLength - 1].time > getTimeInSeconds(timer) && pairsCount === 3;
+      setIsOnLeaderboard(isLeadResult);
       finishGame(STATUS_WON);
       return;
     }
@@ -266,6 +271,8 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
         <div className={styles.modalContainer}>
           <EndGameModal
             isWon={status === STATUS_WON}
+            name={localStorage.name}
+            isOnLeaderboard={isOnLeaderboard}
             gameDurationSeconds={timer.seconds}
             gameDurationMinutes={timer.minutes}
             onClick={resetGame}
