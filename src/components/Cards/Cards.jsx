@@ -142,7 +142,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
       const leaders = await getLeaders();
       const sortedLeaders = sortLeadersByTime(leaders.leaders);
       const leadersLength = sortedLeaders.length;
-      const isLeadResult = sortedLeaders[leadersLength - 1].time > getTimeInSeconds(timer) && pairsCount === 3;
+      const isLeadResult = sortedLeaders[leadersLength - 1].time > getTimeInSeconds(timer) && pairsCount === 9;
       setIsOnLeaderboard(isLeadResult);
       finishGame(STATUS_WON);
       return;
