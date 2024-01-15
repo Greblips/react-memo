@@ -1,27 +1,23 @@
-import axios from "axios";
+// import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styles from "./LeaderBoard.module.css";
-// import { Button } from "../../components/Button/Button";
 import { LeaderboardEl } from "../../components/LeaderBoardEl/LeaderBoardEl";
 import { Link } from "react-router-dom";
 import { formatTime } from "../../utils/formatTime";
+import { getLeaders } from "../../utils/api";
+import { sortLeadersByTime } from "../../utils/formatTime";
 
 export const LeaderBoard = () => {
   const [leaderList, setLeaderList] = useState(null);
   const [error, setError] = useState(null);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("https://wedev-api.sky.pro/api/v2/leaderboard/?limit = 12");
-        const leaderListData = response.data.leaders;
-        const data = leaderListData?.sort((a, b) => (a.time > b.time ? 1 : -1));
-        setLeaderList(data);
-      } catch (error) {
-        setError(error.message);
-      }
-    };
 
-    fetchData();
+  useEffect(() => {
+    getLeaders()
+      .then(leaders => {
+        const sortedLeaders = sortLeadersByTime(leaders.leaders);
+        setLeaderList(sortedLeaders);
+      })
+      .catch(error => setError(error.message));
   }, []);
 
   const leadersElements = leaderList?.map((liderItem, index) => (
