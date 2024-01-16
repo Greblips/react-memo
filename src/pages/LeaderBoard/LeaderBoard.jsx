@@ -27,7 +27,7 @@ export const LeaderBoard = () => {
       key={liderItem.id}
       position={`#${index + 1}`}
       user={liderItem.name}
-      achievements={liderItem?.achievements}
+      achievements={liderItem.achievements}
       time={formatTime(liderItem.time)}
       contextMenu={contextMenu}
       setContextMenu={setContextMenu}

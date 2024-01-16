@@ -49,3 +49,17 @@
 .link:hover {
   background: #7ac100cc;
 }
+.headers {
+  width: 944px;
+  height: 64px;
+  display: flex;
+  box-sizing: border-box;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 24px;
+  font-family: StratosSkyeng;
+  background-color: #fff;
+  border-radius: 12px;
+}
