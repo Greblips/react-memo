@@ -1,8 +1,6 @@
-const baseUrl = "https://wedev-api.sky.pro/api/leaderboard";
-
 export const getLeaders = async () => {
   try {
-    const response = await fetch(baseUrl);
+    const response = await fetch("https://wedev-api.sky.pro/api/v2/leaderboard");
     if (!response) throw new Error("Нет интернета");
     const json = await response.json();
     console.log(json);

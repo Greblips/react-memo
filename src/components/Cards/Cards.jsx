@@ -84,7 +84,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
         console.log(error.message);
       });
     }
-  }, [status]);
+  }, [gameEndDate, gameStartDate, isOnLeaderboard, status]);
 
   function finishGame(status = STATUS_LOST) {
     setGameEndDate(new Date());

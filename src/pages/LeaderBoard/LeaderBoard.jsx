@@ -10,12 +10,14 @@ import { sortLeadersByTime } from "../../utils/formatTime";
 export const LeaderBoard = () => {
   const [leaderList, setLeaderList] = useState(null);
   const [error, setError] = useState(null);
+  const [contextMenu, setContextMenu] = useState(false);
 
   useEffect(() => {
     getLeaders()
       .then(leaders => {
         const sortedLeaders = sortLeadersByTime(leaders.leaders);
         setLeaderList(sortedLeaders);
+        console.log(sortedLeaders);
       })
       .catch(error => setError(error.message));
   }, []);
@@ -25,7 +27,10 @@ export const LeaderBoard = () => {
       key={liderItem.id}
       position={`#${index + 1}`}
       user={liderItem.name}
+      achievements={liderItem?.achievements}
       time={formatTime(liderItem.time)}
+      contextMenu={contextMenu}
+      setContextMenu={setContextMenu}
     />
   ));
   return (
@@ -37,7 +42,13 @@ export const LeaderBoard = () => {
         </Link>
       </div>
       <ul className={styles.table}>
-        <LeaderboardEl position={"Позиция"} user={"Пользователь"} time={"Время"} color={"#999999"} />
+        <LeaderboardEl
+          position={"Позиция"}
+          user={"Пользователь"}
+          achievements={"Достижения"}
+          time={"Время"}
+          color={"#999999"}
+        />
         {leadersElements}
       </ul>
       <p className={styles.error}>{error}</p>

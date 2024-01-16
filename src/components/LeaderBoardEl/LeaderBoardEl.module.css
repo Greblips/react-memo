@@ -17,9 +17,11 @@
 }
 
 .user {
-  width: 65%;
+  width: 55%;
 }
-
+.achievements {
+  width: 10%;
+}
 .time {
   width: 10%;
 }
