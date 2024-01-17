@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import lifeLogo from "./images/life.svg";
 import { getLeaders } from "../../utils/api";
 import { getTimeInSeconds, sortLeadersByTime } from "../../utils/formatTime";
+import SuperItemsView from "../SuperItems/SuperItemsView";
 
 // Игра закончилась
 const STATUS_LOST = "STATUS_LOST";
@@ -46,6 +47,8 @@ function getTimerValue(startDate, endDate) {
  */
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const { isActiveEasyMode } = useSelector(state => state.game);
+
+  const [delay, setDelay] = useState(false);
 
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
@@ -85,6 +88,29 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
       });
     }
   }, [gameEndDate, gameStartDate, isOnLeaderboard, status]);
+
+  function viewCards() {
+    setDelay(true);
+    setCards(
+      cards.map(item => {
+        item.open = true;
+        return item;
+      }),
+    );
+    setTimeout(() => {
+      setDelay(false);
+      console.log(gameStartDate);
+      setGameStartDate(new Date(gameStartDate.getTime() + 5));
+      console.log(gameStartDate);
+      setGameEndDate(null);
+      setCards(
+        cards.map(item => {
+          item.open = false;
+          return item;
+        }),
+      );
+    }, 5000);
+  }
 
   function finishGame(status = STATUS_LOST) {
     setGameEndDate(new Date());
@@ -215,13 +241,15 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
   // Обновляем значение таймера в интервале
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setTimer(getTimerValue(gameStartDate, gameEndDate));
-    }, 300);
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [gameStartDate, gameEndDate]);
+    if (!delay) {
+      const intervalId = setInterval(() => {
+        setTimer(getTimerValue(gameStartDate, gameEndDate));
+      }, 300);
+      return () => {
+        clearInterval(intervalId);
+      };
+    }
+  }, [gameStartDate, gameEndDate, delay]);
 
   return (
     <div className={styles.container}>
@@ -244,6 +272,11 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
                 <div>{timer.seconds.toString().padStart("2", "0")}</div>
               </div>
             </>
+          )}
+          {status === STATUS_IN_PROGRESS && (
+            <div className={styles.superBox}>
+              <SuperItemsView onClick={viewCards} />
+            </div>
           )}
         </div>
         {status === STATUS_IN_PROGRESS && isActiveEasyMode === true ? (
