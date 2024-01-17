@@ -41,16 +41,13 @@ export const LeaderBoard = () => {
           Начать игру
         </Link>
       </div>
-      <ul className={styles.table}>
-        <LeaderboardEl
-          position={"Позиция"}
-          user={"Пользователь"}
-          achievements={"Достижения"}
-          time={"Время"}
-          color={"#999999"}
-        />
-        {leadersElements}
-      </ul>
+      <div className={styles.headers}>
+        <div className={styles.headersitem}>Позиция</div>
+        <div className={styles.headersitem}>Пользователь</div>
+        <div className={styles.headersitem}>Достижения</div>
+        <div className={styles.headersitem}>Время</div>
+      </div>
+      <ul className={styles.table}>{leadersElements}</ul>
       <p className={styles.error}>{error}</p>
     </div>
   );
