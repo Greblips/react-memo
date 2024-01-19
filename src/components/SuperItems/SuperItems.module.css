@@ -1,8 +1,44 @@
-
-.superBox {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 3px;
+.superPowers {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50px;
+  background-color: #c2f5ff;
 }
 
+.superPowersImg {
+  width: 40px;
+  height: 40px;
+}
+[data-tooltip] {
+  position: relative; /* Относительное позиционирование */
+}
+[data-tooltip]::after {
+  z-index: 100;
+  font-size: 1rem;
+  border-radius: 10px;
+  content: attr(data-tooltip); /* Выводим текст */
+  position: absolute; /* Абсолютное позиционирование */
+  width: 300px;
+  left: 0;
+  top: 0;
+  background: #c2f5ff;
+  color: #004980;
+  font-family: StratosSkyeng;
+  padding: 0.5em; /* Поля вокруг текста */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* Параметры тени */
+  pointer-events: none; /* Подсказка */
+  opacity: 0; /* Подсказка невидима */
+  transition: 1s; /* Время появления подсказки */
+}
+[data-tooltip]:hover::after {
+  opacity: 1; /* Показываем подсказку */
+  top: 2em; /* Положение подсказки */
+}
+
+.superPowersDisabled {
+  opacity: 0;
+}

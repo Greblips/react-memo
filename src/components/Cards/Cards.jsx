@@ -1,5 +1,5 @@
 import { shuffle } from "lodash";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { generateDeck } from "../../utils/cards";
 import styles from "./Cards.module.css";
 import { EndGameModal } from "../../components/EndGameModal/EndGameModal";
@@ -10,6 +10,7 @@ import lifeLogo from "./images/life.svg";
 import { getLeaders } from "../../utils/api";
 import { getTimeInSeconds, sortLeadersByTime } from "../../utils/formatTime";
 import SuperItemsView from "../SuperItems/SuperItemsView";
+import SuperItemsAloha from "../SuperItems/SuperItemsAloha";
 
 // Игра закончилась
 const STATUS_LOST = "STATUS_LOST";
@@ -48,7 +49,7 @@ function getTimerValue(startDate, endDate) {
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const { isActiveEasyMode } = useSelector(state => state.game);
 
-  const [delay, setDelay] = useState(false);
+  // const [delay, setDelay] = useState(false);
 
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
@@ -56,7 +57,8 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   // Текущий статус игры
   const [status, setStatus] = useState(STATUS_PREVIEW);
   const [isOnLeaderboard, setIsOnLeaderboard] = useState(false);
-
+  // Использовались ли суперспособности
+  const [isSuperPowers, setisSuperPowers] = useState(false);
   // Дата начала игры
   const [gameStartDate, setGameStartDate] = useState(null);
   // Дата конца игры
@@ -74,6 +76,8 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     seconds: 0,
     minutes: 0,
   });
+
+  const intervalID = useRef(0);
   useEffect(() => {
     if (status === STATUS_WON && isOnLeaderboard) {
       fetch("https://wedev-api.sky.pro/api/v2/leaderboard/?limit = 12", {
@@ -90,18 +94,22 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   }, [gameEndDate, gameStartDate, isOnLeaderboard, status]);
 
   function viewCards() {
-    setDelay(true);
     setCards(
       cards.map(item => {
         item.open = true;
         return item;
       }),
     );
+    const pauseTime = new Date();
+    setGameEndDate(pauseTime);
     setTimeout(() => {
-      setDelay(false);
-      console.log(gameStartDate);
-      setGameStartDate(new Date(gameStartDate.getTime() + 5));
-      console.log(gameStartDate);
+      setGameStartDate(prevStartDate => {
+        const timePaused = new Date().getTime() - pauseTime.getTime();
+        const newStartDate = new Date(prevStartDate.getTime() + timePaused);
+        setGameEndDate(null);
+        return newStartDate;
+      });
+      setGameStartDate(new Date(gameStartDate.getTime() + 5000));
       setGameEndDate(null);
       setCards(
         cards.map(item => {
@@ -110,6 +118,21 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
         }),
       );
     }, 5000);
+  }
+
+  function aloha() {
+    const closedCards = cards.filter(card => !card.open);
+    const randomCard = closedCards[Math.floor(Math.random() * closedCards.length)];
+    const newCards = cards.map(card =>
+      card.rank === randomCard.rank && card.suit === randomCard.suit ? { ...card, open: true } : card,
+    );
+
+    setisSuperPowers(true);
+    setCards(newCards);
+    console.log(isSuperPowers);
+    if (newCards.every(card => card.open)) {
+      finishGame(STATUS_WON);
+    }
   }
 
   function finishGame(status = STATUS_LOST) {
@@ -241,15 +264,13 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
   // Обновляем значение таймера в интервале
   useEffect(() => {
-    if (!delay) {
-      const intervalId = setInterval(() => {
-        setTimer(getTimerValue(gameStartDate, gameEndDate));
-      }, 300);
-      return () => {
-        clearInterval(intervalId);
-      };
-    }
-  }, [gameStartDate, gameEndDate, delay]);
+    intervalID.current = setInterval(() => {
+      setTimer(getTimerValue(gameStartDate, gameEndDate));
+    }, 250);
+    return () => {
+      clearInterval(intervalID.current);
+    };
+  }, [gameStartDate, gameEndDate]);
 
   return (
     <div className={styles.container}>
@@ -273,12 +294,13 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
               </div>
             </>
           )}
-          {status === STATUS_IN_PROGRESS && (
-            <div className={styles.superBox}>
-              <SuperItemsView onClick={viewCards} />
-            </div>
-          )}
         </div>
+        {status === STATUS_IN_PROGRESS && (
+          <div className={styles.superItemContainer}>
+            <SuperItemsView viewCards={viewCards} onClick={viewCards} />
+            <SuperItemsAloha aloha={aloha} onClick={aloha} />
+          </div>
+        )}
         {status === STATUS_IN_PROGRESS && isActiveEasyMode === true ? (
           <div className={styles.liveBox}>
             {lives && lives.map(index => <img key={index} className={styles.liveBlock} src={lifeLogo} alt="hp" />)}
