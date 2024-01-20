@@ -8,7 +8,6 @@ export default function SuperItemsAloha({ aloha }) {
     const handleClick = () => {
         if (!buttonPressed) {
             setButtonPressed(true);
-            console.log(buttonPressed)
             aloha()
 
         }

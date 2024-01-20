@@ -48,14 +48,11 @@ function getTimerValue(startDate, endDate) {
  */
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const { isActiveEasyMode } = useSelector(state => state.game);
-
-  // const [delay, setDelay] = useState(false);
-
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
-
   // Текущий статус игры
   const [status, setStatus] = useState(STATUS_PREVIEW);
+  //Попадаешь ли на лидерборд
   const [isOnLeaderboard, setIsOnLeaderboard] = useState(false);
   // Использовались ли суперспособности
   const [isSuperPowers, setisSuperPowers] = useState(false);
@@ -64,6 +61,9 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   // Дата конца игры
   const [gameEndDate, setGameEndDate] = useState(null);
   const [previousCards, setPreviousCards] = useState(cards);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  //Достижения
+  const achievements = isSuperPowers ? [1] : [1, 2];
   //Счетчик ошибок
   // Количество попыток
   const [tryes, setTryes] = useState(() => (isActiveEasyMode ? 3 : null));
@@ -80,12 +80,13 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const intervalID = useRef(0);
   useEffect(() => {
     if (status === STATUS_WON && isOnLeaderboard) {
-      fetch("https://wedev-api.sky.pro/api/v2/leaderboard/?limit = 12", {
+      fetch("https://wedev-api.sky.pro/api/v2/leaderboard", {
         method: "POST",
         body: JSON.stringify({
           name: localStorage.name,
           time:
             getTimerValue(gameStartDate, gameEndDate).minutes * 60 + getTimerValue(gameStartDate, gameEndDate).seconds,
+          achievements,
         }),
       }).catch(error => {
         console.log(error.message);
@@ -102,6 +103,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     );
     const pauseTime = new Date();
     setGameEndDate(pauseTime);
+    setisSuperPowers(true);
     setTimeout(() => {
       setGameStartDate(prevStartDate => {
         const timePaused = new Date().getTime() - pauseTime.getTime();
@@ -153,6 +155,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     setGameEndDate(null);
     setTimer(getTimerValue(null, null));
     setStatus(STATUS_PREVIEW);
+    setisSuperPowers(false);
   }
 
   /**
@@ -194,6 +197,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
       const isLeadResult = sortedLeaders[leadersLength - 1].time > getTimeInSeconds(timer) && pairsCount === 9;
       setIsOnLeaderboard(isLeadResult);
       finishGame(STATUS_WON);
+
       return;
     }
 
@@ -216,6 +220,8 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     if (isActiveEasyMode && playerLost) {
       setTryes(() => tryes - 1);
       setCards(nextCards);
+      console.log(isSuperPowers);
+      console.log(achievements);
       setTimeout(() => {
         if (tryes <= 1) finishGame(STATUS_LOST);
         setCards(previousCards);

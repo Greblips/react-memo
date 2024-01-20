@@ -8,7 +8,6 @@ export default function SuperItemsView({ viewCards }) {
     const handleClick = () => {
         if (!buttonPressed) {
             setButtonPressed(true);
-            console.log(buttonPressed)
             viewCards()
         }
     };
