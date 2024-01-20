@@ -1,5 +1,5 @@
 import { shuffle } from "lodash";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { generateDeck } from "../../utils/cards";
 import styles from "./Cards.module.css";
 import { EndGameModal } from "../../components/EndGameModal/EndGameModal";
@@ -7,6 +7,10 @@ import { Button } from "../../components/Button/Button";
 import { Card } from "../../components/Card/Card";
 import { useSelector } from "react-redux";
 import lifeLogo from "./images/life.svg";
+import { getLeaders } from "../../utils/api";
+import { getTimeInSeconds, sortLeadersByTime } from "../../utils/formatTime";
+import SuperItemsView from "../SuperItems/SuperItemsView";
+import SuperItemsAloha from "../SuperItems/SuperItemsAloha";
 
 // Игра закончилась
 const STATUS_LOST = "STATUS_LOST";
@@ -44,20 +48,22 @@ function getTimerValue(startDate, endDate) {
  */
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   const { isActiveEasyMode } = useSelector(state => state.game);
-
-  // const [arr, setValue] = useState(lives);
-
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
-
   // Текущий статус игры
   const [status, setStatus] = useState(STATUS_PREVIEW);
-
+  //Попадаешь ли на лидерборд
+  const [isOnLeaderboard, setIsOnLeaderboard] = useState(false);
+  // Использовались ли суперспособности
+  const [isSuperPowers, setisSuperPowers] = useState(false);
   // Дата начала игры
   const [gameStartDate, setGameStartDate] = useState(null);
   // Дата конца игры
   const [gameEndDate, setGameEndDate] = useState(null);
   const [previousCards, setPreviousCards] = useState(cards);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  //Достижения
+  const achievements = isSuperPowers ? [1] : [1, 2];
   //Счетчик ошибок
   // Количество попыток
   const [tryes, setTryes] = useState(() => (isActiveEasyMode ? 3 : null));
@@ -70,6 +76,66 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     seconds: 0,
     minutes: 0,
   });
+
+  const intervalID = useRef(0);
+  useEffect(() => {
+    if (status === STATUS_WON && isOnLeaderboard) {
+      fetch("https://wedev-api.sky.pro/api/v2/leaderboard", {
+        method: "POST",
+        body: JSON.stringify({
+          name: localStorage.name,
+          time:
+            getTimerValue(gameStartDate, gameEndDate).minutes * 60 + getTimerValue(gameStartDate, gameEndDate).seconds,
+          achievements,
+        }),
+      }).catch(error => {
+        console.log(error.message);
+      });
+    }
+  }, [gameEndDate, gameStartDate, isOnLeaderboard, status]);
+
+  function viewCards() {
+    setCards(
+      cards.map(item => {
+        item.open = true;
+        return item;
+      }),
+    );
+    const pauseTime = new Date();
+    setGameEndDate(pauseTime);
+    setisSuperPowers(true);
+    setTimeout(() => {
+      setGameStartDate(prevStartDate => {
+        const timePaused = new Date().getTime() - pauseTime.getTime();
+        const newStartDate = new Date(prevStartDate.getTime() + timePaused);
+        setGameEndDate(null);
+        return newStartDate;
+      });
+      setGameStartDate(new Date(gameStartDate.getTime() + 5000));
+      setGameEndDate(null);
+      setCards(
+        cards.map(item => {
+          item.open = false;
+          return item;
+        }),
+      );
+    }, 5000);
+  }
+
+  function aloha() {
+    const closedCards = cards.filter(card => !card.open);
+    const randomCard = closedCards[Math.floor(Math.random() * closedCards.length)];
+    const newCards = cards.map(card =>
+      card.rank === randomCard.rank && card.suit === randomCard.suit ? { ...card, open: true } : card,
+    );
+
+    setisSuperPowers(true);
+    setCards(newCards);
+    console.log(isSuperPowers);
+    if (newCards.every(card => card.open)) {
+      finishGame(STATUS_WON);
+    }
+  }
 
   function finishGame(status = STATUS_LOST) {
     setGameEndDate(new Date());
@@ -85,11 +151,11 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   }
   function resetGame() {
     isActiveEasyMode && setTryes(3);
-    // isActiveEasyMode && setHp(3);
     setGameStartDate(null);
     setGameEndDate(null);
     setTimer(getTimerValue(null, null));
     setStatus(STATUS_PREVIEW);
+    setisSuperPowers(false);
   }
 
   /**
@@ -99,7 +165,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
    * - "Игрок проиграл", если на поле есть две открытые карты без пары
    * - "Игра продолжается", если не случилось первых двух условий
    */
-  const openCard = clickedCard => {
+  const openCard = async clickedCard => {
     // Если карта уже открыта, то ничего не делаем
     if (clickedCard.open) {
       return;
@@ -119,14 +185,19 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
     const prevCards = [...cards];
 
-    // console.log(nextCards);
     setCards(nextCards);
 
     const isPlayerWon = nextCards.every(card => card.open);
 
     // Победа - все карты на поле открыты
     if (isPlayerWon) {
+      const leaders = await getLeaders();
+      const sortedLeaders = sortLeadersByTime(leaders.leaders);
+      const leadersLength = sortedLeaders.length;
+      const isLeadResult = sortedLeaders[leadersLength - 1].time > getTimeInSeconds(timer) && pairsCount === 9;
+      setIsOnLeaderboard(isLeadResult);
       finishGame(STATUS_WON);
+
       return;
     }
 
@@ -149,6 +220,8 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     if (isActiveEasyMode && playerLost) {
       setTryes(() => tryes - 1);
       setCards(nextCards);
+      console.log(isSuperPowers);
+      console.log(achievements);
       setTimeout(() => {
         if (tryes <= 1) finishGame(STATUS_LOST);
         setCards(previousCards);
@@ -197,11 +270,11 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
   // Обновляем значение таймера в интервале
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    intervalID.current = setInterval(() => {
       setTimer(getTimerValue(gameStartDate, gameEndDate));
-    }, 300);
+    }, 250);
     return () => {
-      clearInterval(intervalId);
+      clearInterval(intervalID.current);
     };
   }, [gameStartDate, gameEndDate]);
 
@@ -228,6 +301,12 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
             </>
           )}
         </div>
+        {status === STATUS_IN_PROGRESS && (
+          <div className={styles.superItemContainer}>
+            <SuperItemsView viewCards={viewCards} onClick={viewCards} />
+            <SuperItemsAloha aloha={aloha} onClick={aloha} />
+          </div>
+        )}
         {status === STATUS_IN_PROGRESS && isActiveEasyMode === true ? (
           <div className={styles.liveBox}>
             {lives && lives.map(index => <img key={index} className={styles.liveBlock} src={lifeLogo} alt="hp" />)}
@@ -253,6 +332,8 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
         <div className={styles.modalContainer}>
           <EndGameModal
             isWon={status === STATUS_WON}
+            name={localStorage.name}
+            isOnLeaderboard={isOnLeaderboard}
             gameDurationSeconds={timer.seconds}
             gameDurationMinutes={timer.minutes}
             onClick={resetGame}

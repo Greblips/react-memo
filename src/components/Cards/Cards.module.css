@@ -85,3 +85,8 @@
   padding: 5px;
   color: #ffffff;
 }
+
+.superItemContainer {
+  display: flex;
+  width: 160px;
+}

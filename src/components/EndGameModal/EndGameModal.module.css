@@ -49,3 +49,23 @@
 
   margin-bottom: 40px;
 }
+
+.nameModal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-family: StratosSkyeng;
+  width: 276px;
+  height: 45px;
+  border-radius: 10px;
+  background-color: #fff;
+}
+.footer {
+  margin-top: 10px;
+  align-items: center;
+  width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
