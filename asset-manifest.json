@@ -1,10 +1,14 @@
 {
   "files": {
-    "main.css": "/react-memo/static/css/main.b99c86dc.css",
-    "main.js": "/react-memo/static/js/main.053eb734.js",
+    "main.css": "/react-memo/static/css/main.24c56b19.css",
+    "main.js": "/react-memo/static/js/main.ebacb23a.js",
     "static/media/StratosSkyeng.woff2": "/react-memo/static/media/StratosSkyeng.ce93393e831d32412096.woff2",
     "static/media/celebration.png": "/react-memo/static/media/celebration.2577e3c3835ac1f32429.png",
     "static/media/dead.png": "/react-memo/static/media/dead.bfb3f81b5110f1b62252.png",
+    "static/media/eye.svg": "/react-memo/static/media/eye.141f49a5d0ff6164bddab2fc3ce0fe9a.svg",
+    "static/media/hard.svg": "/react-memo/static/media/hard.edb38b65ff57d44e123ed17aa568bc27.svg",
+    "static/media/magic.svg": "/react-memo/static/media/magic.c41d255357b4cb3131bcc9033e4dd766.svg",
+    "static/media/Aloha.svg": "/react-memo/static/media/Aloha.3ced6796fa2afe58d343d1a451324588.svg",
     "static/media/life.svg": "/react-memo/static/media/life.b908e056e05e24a592f29ba4e3ba4b9a.svg",
     "static/media/сard-shirt.svg": "/react-memo/static/media/сard-shirt.ee1c021f7ee4ddc65293b8afcc81859d.svg",
     "static/media/cross.svg": "/react-memo/static/media/cross.a67a9b79b3c4428c4927895e6c820391.svg",
@@ -12,11 +16,11 @@
     "static/media/hearts.svg": "/react-memo/static/media/hearts.61a332d669720824455d75936096b657.svg",
     "static/media/spades.svg": "/react-memo/static/media/spades.d5657ff5be305701be575ad4403987f4.svg",
     "static/media/diamonds.svg": "/react-memo/static/media/diamonds.60153c09fb0fa0f9b5bab2a62d795342.svg",
-    "main.b99c86dc.css.map": "/react-memo/static/css/main.b99c86dc.css.map",
-    "main.053eb734.js.map": "/react-memo/static/js/main.053eb734.js.map"
+    "main.24c56b19.css.map": "/react-memo/static/css/main.24c56b19.css.map",
+    "main.ebacb23a.js.map": "/react-memo/static/js/main.ebacb23a.js.map"
   },
   "entrypoints": [
-    "static/css/main.b99c86dc.css",
-    "static/js/main.053eb734.js"
+    "static/css/main.24c56b19.css",
+    "static/js/main.ebacb23a.js"
   ]
 }
